@@ -1,0 +1,9 @@
+{
+  "color": {
+    "name": "Name",
+    "color": "Color",
+    "advanced": "Advanced",
+    "apply": "Apply on msg.",
+    "white": "Use white: "
+  }
+}

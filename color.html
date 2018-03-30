@@ -1,0 +1,111 @@
+<script type="text/x-red" data-template-name="color">
+   <div class="form-row">
+    <link rel="stylesheet" type="text/css" href="/color/farbtastic/farbtastic.css"/>
+    <div class = "form-row" style="padding-top:10px;">
+      <label for="node-input-name"><i class = "icon-tag"></i> <span data-i18n="color.name"></span></label>
+      <input type="text" id="node-input-name" style="width: 200px;" data-i18n="[placeholder]color.name">
+    </div>
+  </div>
+  <div class="form-row" id="colorpicker"></div>
+    <div class = "form-row">
+      <label for="node-input-textcolor"><i class = "icon-tag"></i> <span data-i18n="color.color"></span></label>
+      <input type="text" id="node-input-color" placeholder="#FFFFFF">
+    </div>
+  <div class="advanced">
+    <div class="form-row" style="padding-top:10px;">
+      <span data-i18n="color.apply"></span><input type="text" id="node-input-property" style="width: 200px;"/>
+    </div>
+    <div class="form-row" style="padding-top:10px;">
+      <span data-i18n="color.white"></span><input type="checkbox" id="node-input-white" style="width: auto;"/>
+      <input type="hidden" id="node-input-val" style = "width: 10%;" placeholder = "0"/>
+    </div>
+    <div class="form-row" id="sliderWhite" style="width:100%; display:none; margin-left:auto;  margin-right:auto;">
+    </div>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="color">
+  <p>This node allows you to chose a color from a colorpicker.</p>
+
+  <h3>Advanced</h3>
+
+  <p>The selected color will be set in <code>msg.<b>color</b></code>.</p>
+  <p>You can dynamically override the selected value by setting a color via
+  <code>msg.<b>color</b></code>, <code>msg.<b>value</b></code>, or else
+  <code>msg.<b>payload</b></code></p>
+  <p>Color must be in <b>RGB</b> format. Here are examples : </p>
+  <ul>
+    <li><code>#ff0000</code> is red.</li>
+    <li><code>#00ff00</code> is green.</li>
+    <li><code>#0000ff</code> is blue.</li>
+  </ul>
+  <p>You can choose to put the color in another attribute than color, in the
+  configuration advanced panel.</p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('color',{
+    category: 'basic',
+    color:"#ffffff",
+    defaults: {
+      property: {value:"color", required:true},
+      color: {value:"#ff0000",  required:true},
+      val: {value:"0000"},
+      white: {value: false},
+      name:{value:""}
+    },
+    inputs:1,
+    outputs:1,
+    icon: "colors.png",
+    paletteLabel:"Color&nbsp;",
+    label: function() {
+      return this.name||"Color";
+    },
+    oneditprepare: function() {
+      var value = parseInt(this.val, 16);
+      $("#sliderWhite").slider({
+        create: function(event, ui){
+          if(value >= parseInt("0000", 16) && value <= parseInt("ffff", 16)){
+            $("#sliderWhite").slider('value',value);
+          }
+          else{
+            $("#sliderWhite").slider('value',0);
+          }
+        },
+        min: parseInt("0000", 16),
+        max: parseInt("ffff", 16),
+        slide: function( event, ui ) {
+          $("#node-input-val").val(ui.value.toString(16));
+        }
+      });
+
+      if($('#node-input-white').is(":checked")) {
+        $('#node-input-white').val(true);
+        $("#sliderWhite").show();
+      } else {
+        $('#node-input-white').val(false);
+        $("#sliderWhite").hide();
+      }
+
+      $('#node-input-white').click(function () {
+        $('#node-input-white').val(this.checked);
+        $("#sliderWhite").toggle(this.checked);
+      });
+
+      $.getScript('/color/farbtastic/farbtastic.js', function(){
+        var f = $.farbtastic ( "#colorpicker" );
+        var input = $ ( "#node-input-color" );
+        input.on ( "change", function ( ) { f.linkTo ( input );} );
+        f.linkTo ( input );
+        $ ( ".farbtastic" ).css ( "margin", "auto" );
+      });
+
+      $.getScript('/color/slide.js', function(){
+        $(".advanced").slide({
+          onUp: function(){$('#node-input-color').css("font-size", "0");},
+          onDown: function(){$('#node-input-color').css("font-size", "");}
+        });
+      });
+    }
+  });
+</script>

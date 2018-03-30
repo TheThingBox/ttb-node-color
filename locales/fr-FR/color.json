@@ -1,0 +1,9 @@
+{
+  "color": {
+    "name": "Nom",
+    "color": "Couleur",
+    "advanced": "Avancé",
+    "apply": "Appliquer sur msg.",
+    "white": "Utiliser le blanc : "
+  }
+}
